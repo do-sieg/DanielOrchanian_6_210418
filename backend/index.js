@@ -1,8 +1,10 @@
 // Modules
+import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import userRouter from './routes/users';
+import sauceRouter from './routes/sauces';
 
 // Connection à la base de données
 mongoose.connect('mongodb+srv://admin-1:test-fghjkl@cluster0.18ayp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
@@ -26,7 +28,12 @@ app.use((req, res, next) => {
     next();
 });
 
+// Gère les requêtes de la route /images de manière statique
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
+// Routes
 app.use('/api/auth', userRouter);
+app.use('/api/sauces', sauceRouter);
 
 // Écoute du port
 const PORT = 3000;

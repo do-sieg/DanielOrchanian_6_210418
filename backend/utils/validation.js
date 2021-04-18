@@ -1,4 +1,3 @@
-
 // Check if string has special characters
 export function hasSpecialChars(value, allowed = []) {
     const checks = [];
