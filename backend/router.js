@@ -1,5 +1,7 @@
 // Modules
 import express from 'express';
+import User from './models/user';
+import { isValidEmail } from './utils/validation';
 
 // Création du routeur
 const router = express.Router();
@@ -10,14 +12,36 @@ router.get("/", async (req, res, next) => {
 });
 
 
-router.post("/api/auth/signup", async (req, res, next) => {
+function validateSignupParams(req, res, next) {
+    if (req.body.password && req.body.password !== "" && req.body.email && req.body.email !== "") {
+        if (isValidEmail(req.body.email)) {
+            next();
+        } else {
+            res.status(400).json({ message: "Paramètres manquants ou invalides." });
+        }
+    } else {
+        res.status(400).json({ message: "Paramètres manquants ou invalides." });
+    }
+}
 
-    console.log("IN SIGNUP");
 
-    
+router.post("/api/auth/signup", validateSignupParams, async (req, res, next) => {
+
+    try {
+        const user = new User({
+            email: req.body.email,
+            password: req.body.password,
+        });
+
+        
+        user.save()
+            .then(() => res.status(201).json({ message: "Utilisateur enregistré." }))
+            .catch(error => res.status(400).json({ error }));
+    } catch (err) {
+        res.status(500).json({ err });
+    }
 
 
-    
 });
 
 export default router;
