@@ -1,12 +1,9 @@
 // Modules
 import fs from 'fs';
 import express from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import Sauce from '../models/sauce';
-import { isValidEmail } from '../utils/validation';
 import midMulter from '../middlewares/midMulter';
-import { auth } from '../middlewares/auth';
+import { auth, isOwner } from '../middlewares/auth';
 
 // Création du routeur
 const router = express.Router();
@@ -58,24 +55,27 @@ router.post("/", auth, midMulter, async (req, res, next) => {
 router.put("/:id", auth, midMulter, async (req, res, next) => {
     try {
         let newData;
-        if (req.body.sauce && req.file) {
-            const oldData = await Sauce.findOne({ _id: req.params.id });
-
-            fs.unlink(`images/${oldData.imageUrl.split('/images/')[1]}`, (err) => {
-                if (err) throw err;
-            });
+        if (req.body.sauce) {
             newData = JSON.parse(req.body.sauce);
-            newData.imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
-
-            console.log("newData", newData);
-
         } else {
             newData = req.body;
         }
 
-        await Sauce.updateOne({ _id: req.params.id }, newData);
-        res.status(200).json({ message: 'Sauce mise à jour.' });
-
+        const checkOwnership = isOwner(req, res, newData.userId);
+        if (checkOwnership === false) {
+            res.status(403).json({ message: "Pas autorisé à effectuer cette action." });
+        } else {
+            if (req.file) {
+                const oldData = await Sauce.findOne({ _id: req.params.id });
+                fs.unlink(`images/${oldData.imageUrl.split('/images/')[1]}`, (err) => {
+                    if (err) throw err;
+                });
+                newData.imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+            }
+    
+            await Sauce.updateOne({ _id: req.params.id }, newData);
+            res.status(200).json({ message: 'Sauce mise à jour.' });
+        }
     } catch (err) {
         res.status(500).json({ err });
     }
@@ -86,12 +86,18 @@ router.delete("/:id", auth, async (req, res, next) => {
     try {
         const sauce = await Sauce.findOne({ _id: req.params.id });
         if (sauce) {
-            fs.unlink(`images/${sauce.imageUrl.split('/images/')[1]}`, async (err) => {
-                if (err) throw err;
+            const checkOwnership = isOwner(req, res, sauce.userId);
+            if (checkOwnership === false) {
+                res.status(403).json({ message: "Pas autorisé à effectuer cette action." });
+            } else {
+                fs.unlink(`images/${sauce.imageUrl.split('/images/')[1]}`, async (err) => {
+                    if (err) throw err;
+    
+                    await Sauce.deleteOne({ _id: req.params.id });
+                    res.status(200).json({ message: 'Sauce supprimée.' })
+                });
+            }
 
-                await Sauce.deleteOne({ _id: req.params.id });
-                res.status(200).json({ message: 'Sauce supprimée.' })
-            });
         } else {
             res.status(404);
         }
