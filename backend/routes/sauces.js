@@ -25,7 +25,7 @@ router.get("/:id", auth, async (req, res, next) => {
         if (sauce) {
             res.status(200).json(sauce);
         } else {
-            res.status(404);
+            res.status(404).json({ message: "Sauce introuvable." });
         }
     } catch (err) {
         res.status(500).json({ err });
@@ -99,7 +99,7 @@ router.delete("/:id", auth, async (req, res, next) => {
             }
 
         } else {
-            res.status(404);
+            res.status(404).json({ message: "Sauce introuvable." });
         }
     } catch (err) {
         res.status(500).json({ err });

@@ -49,10 +49,10 @@ router.post("/login", validateAuthParams, async (req, res, next) => {
                 };
                 res.status(200).json(payload);
             } else {
-                res.status(401).json({ error: 'Mot de passe incorrect.' });
+                res.status(401).json({ message: 'Mot de passe incorrect.' });
             }
         } else {
-            res.status(400).json({ error: 'Utilisateur non trouvé.' });
+            res.status(400).json({ message: 'Utilisateur non trouvé.' });
         }
     } catch (err) {
         res.status(500).json({ err });
