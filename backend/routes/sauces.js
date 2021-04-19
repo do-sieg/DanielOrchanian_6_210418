@@ -72,7 +72,7 @@ router.put("/:id", auth, midMulter, async (req, res, next) => {
                 });
                 newData.imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
             }
-    
+
             await Sauce.updateOne({ _id: req.params.id }, newData);
             res.status(200).json({ message: 'Sauce mise à jour.' });
         }
@@ -92,7 +92,7 @@ router.delete("/:id", auth, async (req, res, next) => {
             } else {
                 fs.unlink(`images/${sauce.imageUrl.split('/images/')[1]}`, async (err) => {
                     if (err) throw err;
-    
+
                     await Sauce.deleteOne({ _id: req.params.id });
                     res.status(200).json({ message: 'Sauce supprimée.' })
                 });
@@ -106,5 +106,40 @@ router.delete("/:id", auth, async (req, res, next) => {
     }
 });
 
+
+router.post("/:id/like", auth, async (req, res, next) => {
+    try {
+        if (req.body.userId && [-1, 0, 1].includes(req.body.like)) {
+            const sauce = await Sauce.findOne({ _id: req.params.id });
+
+            sauce.usersLiked = sauce.usersLiked.filter(id => id != req.body.userId);
+            sauce.usersDisliked = sauce.usersDisliked.filter(id => id != req.body.userId);
+
+            switch (req.body.like) {
+                case 1:
+                    sauce.usersLiked.push(req.body.userId);
+                    break;
+                case -1:
+                    sauce.usersDisliked.push(req.body.userId);
+                    break;
+                default:
+                    break;
+            }
+
+            sauce.likes = sauce.usersLiked.length;
+            sauce.dislikes = sauce.usersDisliked.length;
+
+            await Sauce.updateOne({ _id: sauce._id }, sauce);
+
+            res.status(200).json({ message: 'Sauce likée.' });
+
+        } else {
+            res.status(400).json({ message: "Paramètres manquants ou invalides." });
+        }
+
+    } catch (err) {
+        res.status(500).json({ err });
+    }
+});
 
 export default router;
