@@ -6,7 +6,7 @@ export function auth(req, res, next) {
         if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
             const split = req.headers.authorization.split("Bearer ");
             const token = split[split.length - 1];
-            const decoded = jwt.verify(token, 'RANDOM_TOKEN_KEY');
+            const decoded = jwt.verify(token, process.env.TOKEN_KEY);
             if (decoded !== undefined) {
                 authTest = true;
             }

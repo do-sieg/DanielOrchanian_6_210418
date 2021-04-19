@@ -45,7 +45,7 @@ router.post("/login", validateAuthParams, async (req, res, next) => {
             if (validPass === true) {
                 const payload = {
                     userId: user._id,
-                    token: jwt.sign({ userId: user._id }, 'RANDOM_TOKEN_KEY', { expiresIn: '24h' })
+                    token: jwt.sign({ userId: user._id }, process.env.TOKEN_KEY, { expiresIn: '24h' })
                 };
                 res.status(200).json(payload);
             } else {

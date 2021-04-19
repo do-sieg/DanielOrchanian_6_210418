@@ -1,13 +1,17 @@
 // Modules
 import path from 'path';
+import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import userRouter from './routes/users';
 import sauceRouter from './routes/sauces';
 
+// Environment variables
+dotenv.config();
+
 // Connection à la base de données
-mongoose.connect('mongodb+srv://admin-1:test-fghjkl@cluster0.18ayp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.18ayp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -36,5 +40,5 @@ app.use('/api/auth', userRouter);
 app.use('/api/sauces', sauceRouter);
 
 // Écoute du port
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Serveur actif sur le port ${PORT}`));
