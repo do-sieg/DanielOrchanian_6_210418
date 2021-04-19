@@ -1,4 +1,5 @@
 // Modules
+import fs from 'fs';
 import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -54,5 +55,50 @@ router.post("/", auth, midMulter, async (req, res, next) => {
 });
 
 
-export default router;
+router.put("/:id", auth, midMulter, async (req, res, next) => {
+    try {
+        let newData;
+        if (req.body.sauce && req.file) {
+            const oldData = await Sauce.findOne({ _id: req.params.id });
 
+            fs.unlink(`images/${oldData.imageUrl.split('/images/')[1]}`, (err) => {
+                if (err) throw err;
+            });
+            newData = JSON.parse(req.body.sauce);
+            newData.imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+
+            console.log("newData", newData);
+
+        } else {
+            newData = req.body;
+        }
+
+        await Sauce.updateOne({ _id: req.params.id }, newData);
+        res.status(200).json({ message: 'Sauce mise à jour.' });
+
+    } catch (err) {
+        res.status(500).json({ err });
+    }
+});
+
+
+router.delete("/:id", auth, async (req, res, next) => {
+    try {
+        const sauce = await Sauce.findOne({ _id: req.params.id });
+        if (sauce) {
+            fs.unlink(`images/${sauce.imageUrl.split('/images/')[1]}`, async (err) => {
+                if (err) throw err;
+
+                await Sauce.deleteOne({ _id: req.params.id });
+                res.status(200).json({ message: 'Sauce supprimée.' })
+            });
+        } else {
+            res.status(404);
+        }
+    } catch (err) {
+        res.status(500).json({ err });
+    }
+});
+
+
+export default router;

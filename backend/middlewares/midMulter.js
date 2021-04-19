@@ -1,3 +1,4 @@
+import path from 'path';
 import multer from 'multer';
 
 const MIME_TYPES = {
@@ -14,7 +15,8 @@ const storage = multer.diskStorage({
     filename: (req, file, callback) => {
         const name = file.originalname.split(' ').join('-');
         const ext = MIME_TYPES[file.mimetype];
-        callback(null, name + Date.now() + '.' + ext);
+        const base = path.basename(name, '.' + ext);
+        callback(null, Date.now() + "_" + base + '.' + ext);
     }
 });
 
