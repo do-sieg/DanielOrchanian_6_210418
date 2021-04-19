@@ -5,13 +5,13 @@ import jwt from 'jsonwebtoken';
 import Sauce from '../models/sauce';
 import { isValidEmail } from '../utils/validation';
 import midMulter from '../middlewares/midMulter';
+import { auth } from '../middlewares/auth';
 
 // Création du routeur
 const router = express.Router();
 
 
-// NEED AUTH
-router.get("/", async (req, res, next) => {
+router.get("/", auth, async (req, res, next) => {
     try {
         const sauces = await Sauce.find();
         res.status(200).json(sauces);
@@ -20,8 +20,22 @@ router.get("/", async (req, res, next) => {
     }
 });
 
-// NEED AUTH
-router.post("/", midMulter, async (req, res, next) => {
+
+router.get("/:id", auth, async (req, res, next) => {
+    try {
+        const sauce = await Sauce.findOne({ _id: req.params.id });
+        if (sauce) {
+            res.status(200).json(sauce);
+        } else {
+            res.status(404);
+        }
+    } catch (err) {
+        res.status(500).json({ err });
+    }
+});
+
+
+router.post("/", auth, midMulter, async (req, res, next) => {
     try {
         if (req.body.sauce) {
             const obj = JSON.parse(req.body.sauce);
@@ -38,6 +52,7 @@ router.post("/", midMulter, async (req, res, next) => {
         res.status(500).json({ err });
     }
 });
+
 
 export default router;
 
