@@ -10,21 +10,21 @@ import sauceRouter from './routes/sauces';
 // Environment variables
 dotenv.config();
 
-// Connection à la base de données
+// Database connection
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.18ayp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
-    .then(() => console.log('Connexion à MongoDB réussie !'))
-    .catch(() => console.log('Connexion à MongoDB échouée !'));
+    .then(() => console.log('Successfully connected to MongoDB.'))
+    .catch(() => console.log('Failed connecting to MongoDB.'));
 
-// Mise en place du serveur
+// Set up express server
 const app = express();
 
 app.use(bodyParser.json());
 
-// Permissions du CORS
+// CORS permissions
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
@@ -32,13 +32,13 @@ app.use((req, res, next) => {
     next();
 });
 
-// Gère les requêtes de la route /images de manière statique
+// Manage static requests for the /images route
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Routes
 app.use('/api/auth', userRouter);
 app.use('/api/sauces', sauceRouter);
 
-// Écoute du port
+// Port listening
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Serveur actif sur le port ${PORT}`));
+app.listen(PORT, () => console.log(`Server active on port ${PORT}`));
