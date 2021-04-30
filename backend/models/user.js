@@ -7,7 +7,7 @@ const userSchema = mongoose.Schema({
 });
 
 // Plugin to manage unique emails
-userSchema.plugin(uniqueValidator);
+userSchema.plugin(uniqueValidator, { message: 'Error, expected {PATH} to be unique.' });
 
 export default mongoose.model('User', userSchema);
 
