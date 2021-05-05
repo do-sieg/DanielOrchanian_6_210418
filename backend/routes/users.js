@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user';
 import { isValidEmail, isValidPassword } from '../utils/validation';
 import md5 from 'md5';
+import { bouncer } from '../middlewares/bouncer';
 
 // Create router
 const router = express.Router();
@@ -16,7 +17,7 @@ function validateAuthParams(req, res, next) {
         // Check if password is valid
         if (!isValidPassword(req.body.password)) {
             res.status(400).json({ message: "Mot de passe non valide (6 caractères minimum, une majuscule, une minuscule, un chiffre et un caractère spécial)." });
-        // Check if email is valid
+            // Check if email is valid
         } else if (!isValidEmail(req.body.email)) {
             res.status(400).json({ message: "Paramètres manquants ou invalides." });
         } else {
@@ -47,7 +48,7 @@ router.post("/signup", validateAuthParams, async (req, res, next) => {
 });
 
 // Login route
-router.post("/login", validateAuthParams, async (req, res, next) => {
+router.post("/login", bouncer.block, validateAuthParams, async (req, res, next) => {
     try {
         // Find user with email
         const hashEmail = md5(req.body.email);
@@ -58,6 +59,8 @@ router.post("/login", validateAuthParams, async (req, res, next) => {
             const validPass = await bcrypt.compareSync(req.body.password, user.password);
             // If the passwords match
             if (validPass === true) {
+                // Reset bouncer
+                bouncer.reset(req);
                 // Send user ID and token
                 const payload = {
                     userId: user._id,

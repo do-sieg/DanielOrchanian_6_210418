@@ -15,14 +15,13 @@
     "bcrypt": "^5.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-bouncer": "^0.2.0",
     "helmet": "^4.6.0",
     "jsonwebtoken": "^8.5.1",
     "md5": "^2.3.0",
-    "mongo-mask": "^1.1.0",
     "mongoose": "^5.12.4",
     "mongoose-unique-validator": "^2.0.3",
-    "multer": "^1.4.2",
-    "rate-limiter-flexible": "^2.2.2"
+    "multer": "^1.4.2"
   },
   "devDependencies": {
     "babel-polyfill": "^6.26.0",
