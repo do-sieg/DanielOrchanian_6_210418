@@ -2,7 +2,7 @@
 import path from 'path';
 import dotenv from 'dotenv';
 import express from 'express';
-import bodyParser from 'body-parser';
+import helmet from 'helmet';
 import mongoose from 'mongoose';
 import userRouter from './routes/users';
 import sauceRouter from './routes/sauces';
@@ -21,8 +21,8 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD
 
 // Set up express server
 const app = express();
-
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(helmet());
 
 // CORS permissions
 app.use((req, res, next) => {
