@@ -25,3 +25,11 @@ export function isValidEmail(value) {
     }
     return false;
 }
+
+// Check if password is valid
+export function isValidPassword(value) {
+    // Must be longer than 6 characters, contains at least one lowercase letter,
+    // one uppercase letter, one numeric digit, and one special character
+    const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,}$/;
+    return re.test(value)
+}

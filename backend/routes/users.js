@@ -3,7 +3,7 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
-import { isValidEmail } from '../utils/validation';
+import { isValidEmail, isValidPassword } from '../utils/validation';
 import md5 from 'md5';
 
 // Create router
@@ -13,11 +13,14 @@ const router = express.Router();
 function validateAuthParams(req, res, next) {
     // Check if required parameters are sent
     if (req.body.password && req.body.password !== "" && req.body.email && req.body.email !== "") {
+        // Check if password is valid
+        if (!isValidPassword(req.body.password)) {
+            res.status(400).json({ message: "Mot de passe non valide (6 caractères minimum, une majuscule, une minuscule, un chiffre et un caractère spécial)." });
         // Check if email is valid
-        if (isValidEmail(req.body.email)) {
-            next();
-        } else {
+        } else if (!isValidEmail(req.body.email)) {
             res.status(400).json({ message: "Paramètres manquants ou invalides." });
+        } else {
+            next();
         }
     } else {
         res.status(400).json({ message: "Paramètres manquants ou invalides." });
