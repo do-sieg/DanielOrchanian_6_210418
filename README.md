@@ -1,5 +1,23 @@
-# Projet 6 OpenClassrooms
+# Construire une API sécurisée pour une application d'avis gastronomiques (NodeJS)
 
+
+## Description
+
+L'objectif est de concevoir une interface de programmation (API) permettant de créer et modifier du contenu, le tout de manière sécurisée.
+
+
+## Contraintes
+
+La partie backend doit être développée avec NodeJS et la base de données faite avec MongoDB. Un frontend (AngularJS) est fourni et ne doit pas être modifié.
+
+
+## Compétences évaluées
+
+- Implémenter un modèle logique de données conformément à la réglementation
+- Stocker des données de manière sécurisée
+- Mettre en œuvre des opérations CRUD de manière sécurisée
+
+---
 
 ## Installer le projet
 
